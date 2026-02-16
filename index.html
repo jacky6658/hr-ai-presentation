@@ -52,6 +52,38 @@
       background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
     }
     
+    /* 手機螢幕優化 (小於 375px) */
+    @media (max-width: 375px) {
+      .slide {
+        padding: 1.5rem;
+      }
+      .slide h1 {
+        font-size: 2rem !important;
+      }
+      .slide h2 {
+        font-size: 1.5rem !important;
+      }
+      .slide p, .slide li {
+        font-size: 0.875rem !important;
+      }
+    }
+    
+    /* 大螢幕優化 (桌面/平板橫屏) */
+    @media (min-width: 768px) {
+      .slide {
+        max-width: 500px;
+        max-height: 889px;
+      }
+    }
+    
+    /* 超大螢幕 */
+    @media (min-width: 1024px) {
+      .slide {
+        max-width: 600px;
+        max-height: 1067px;
+      }
+    }
+    
     .slide.active {
       opacity: 1;
       transform: translateX(0);
