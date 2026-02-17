@@ -4,512 +4,504 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HR 導入 AI - 選育用留規劃</title>
-  
   <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/3.0.23/tailwind.min.js"></script>
-  
   <link href="https://fonts.loli.net/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
   <link href="https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@300;400;700;900&display=swap" rel="stylesheet">
-  
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Noto Sans SC', 'Inter', sans-serif;
-      background: #000;
-      color: #fff;
-      overflow: hidden;
-    }
-    
-    .slides-container {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0a0a0a;
-    }
-    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Noto Sans SC', 'Inter', sans-serif; background: #000; color: #fff; overflow: hidden; }
+    .slides-container { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: #050505; }
     .slide {
-      width: 100%;
-      height: 100%;
-      max-width: 450px;
-      max-height: 800px;
+      width: 100%; height: 100%;
+      max-width: 450px; max-height: 800px;
       aspect-ratio: 9/16;
       position: absolute;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       padding: 2.5rem;
-      opacity: 0;
-      transform: translateX(100%);
+      opacity: 0; transform: translateX(100%);
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
-      background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
+      background: linear-gradient(180deg, #0a0a0a 0%, #000 100%);
     }
-    
-    /* 手機螢幕優化 (小於 375px) */
+    .slide.active { opacity: 1; transform: translateX(0); }
+    .slide.prev { opacity: 0; transform: translateX(-100%); }
+    .light-spot { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.25; pointer-events: none; }
+    .ls1 { width: 300px; height: 300px; background: #3b82f6; top: -100px; right: -100px; animation: f1 20s ease-in-out infinite; }
+    .ls2 { width: 250px; height: 250px; background: #8b5cf6; bottom: -80px; left: -80px; animation: f2 25s ease-in-out infinite; }
+    .ls3 { width: 200px; height: 200px; background: #06b6d4; top: 50%; left: 50%; transform: translate(-50%,-50%); animation: f3 18s ease-in-out infinite; }
+    .ls-pink { width: 280px; height: 280px; background: #ec4899; bottom: -80px; right: -60px; animation: f2 22s ease-in-out infinite; }
+    .ls-green { width: 260px; height: 260px; background: #10b981; top: -80px; left: -60px; animation: f1 24s ease-in-out infinite; }
+    @keyframes f1 { 0%,100%{transform:translate(0,0)} 25%{transform:translate(-50px,30px)} 50%{transform:translate(30px,50px)} 75%{transform:translate(50px,-20px)} }
+    @keyframes f2 { 0%,100%{transform:translate(0,0)} 33%{transform:translate(40px,-40px)} 66%{transform:translate(-30px,30px)} }
+    @keyframes f3 { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.2)} }
+    .content { position: relative; z-index: 10; text-align: center; width: 100%; }
+    .progress-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 100; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s; }
+    .dot.active { background: #fff; transform: scale(1.4); }
+    .dot:hover { background: rgba(255,255,255,0.6); }
+    .page-num { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: rgba(255,255,255,0.3); z-index: 100; }
+    .icon-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; }
+    .stat-bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; margin-top: 0.5rem; }
+    .stat-fill { height: 100%; border-radius: 999px; animation: fillBar 1.5s ease forwards; }
+    @keyframes fillBar { from{width:0} }
+    .tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
     @media (max-width: 375px) {
-      .slide {
-        padding: 1.5rem;
-      }
-      .slide h1 {
-        font-size: 2rem !important;
-      }
-      .slide h2 {
-        font-size: 1.5rem !important;
-      }
-      .slide p, .slide li {
-        font-size: 0.875rem !important;
-      }
+      .slide { padding: 1.5rem; }
+      .slide h1 { font-size: 2rem !important; }
+      .slide h2 { font-size: 1.4rem !important; }
     }
-    
-    /* 大螢幕優化 (桌面/平板橫屏) */
-    @media (min-width: 768px) {
-      .slide {
-        max-width: 500px;
-        max-height: 889px;
-      }
-    }
-    
-    /* 超大螢幕 */
-    @media (min-width: 1024px) {
-      .slide {
-        max-width: 600px;
-        max-height: 1067px;
-      }
-    }
-    
-    .slide.active {
-      opacity: 1;
-      transform: translateX(0);
-    }
-    
-    .slide.prev {
-      opacity: 0;
-      transform: translateX(-100%);
-    }
-    
-    .light-spot {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.3;
-      pointer-events: none;
-    }
-    
-    .light-spot-1 {
-      width: 300px;
-      height: 300px;
-      background: #3b82f6;
-      top: -100px;
-      right: -100px;
-      animation: float1 20s ease-in-out infinite;
-    }
-    
-    .light-spot-2 {
-      width: 250px;
-      height: 250px;
-      background: #8b5cf6;
-      bottom: -80px;
-      left: -80px;
-      animation: float2 25s ease-in-out infinite;
-    }
-    
-    .light-spot-3 {
-      width: 200px;
-      height: 200px;
-      background: #06b6d4;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      animation: float3 18s ease-in-out infinite;
-    }
-    
-    @keyframes float1 {
-      0%, 100% { transform: translate(0, 0); }
-      25% { transform: translate(-50px, 30px); }
-      50% { transform: translate(30px, 50px); }
-      75% { transform: translate(50px, -20px); }
-    }
-    
-    @keyframes float2 {
-      0%, 100% { transform: translate(0, 0); }
-      33% { transform: translate(40px, -40px); }
-      66% { transform: translate(-30px, 30px); }
-    }
-    
-    @keyframes float3 {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); }
-      50% { transform: translate(-50%, -50%) scale(1.2); }
-    }
-    
-    .slide-content {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      width: 100%;
-    }
-    
-    .progress-bar {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 8px;
-      z-index: 100;
-    }
-    
-    .progress-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.3);
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .progress-dot.active {
-      background: #fff;
-      transform: scale(1.3);
-    }
-    
-    .progress-dot:hover {
-      background: rgba(255,255,255,0.6);
-    }
-    
-    .page-number {
-      position: fixed;
-      bottom: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.875rem;
-      color: rgba(255,255,255,0.4);
-      z-index: 100;
-    }
+    @media (min-width: 768px) { .slide { max-width: 500px; max-height: 889px; } }
+    @media (min-width: 1024px) { .slide { max-width: 580px; max-height: 1031px; } }
   </style>
 </head>
 <body>
-  <div class="slides-container">
-    
-    <!-- 1. 封面頁 -->
-    <div class="slide active">
-      <div class="light-spot light-spot-1"></div>
-      <div class="light-spot light-spot-2"></div>
-      <div class="slide-content">
-        <h1 class="text-5xl font-black mb-6 leading-tight">HR 導入 AI</h1>
-        <p class="text-xl font-light text-gray-400">選育用留全面升級</p>
+<div class="slides-container">
+
+  <!-- 1. 封面 -->
+  <div class="slide active">
+    <div class="light-spot ls1"></div>
+    <div class="light-spot ls2"></div>
+    <div class="content">
+      <div style="font-size:4rem;margin-bottom:1rem">🤖</div>
+      <h1 style="font-size:2.8rem;font-weight:900;line-height:1.1;margin-bottom:1rem">HR 導入 AI</h1>
+      <p style="font-size:1.1rem;color:#9ca3af;margin-bottom:2rem">選育用留全面升級</p>
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+        <span class="tag" style="background:rgba(59,130,246,0.2);color:#60a5fa">選才</span>
+        <span class="tag" style="background:rgba(139,92,246,0.2);color:#a78bfa">育才</span>
+        <span class="tag" style="background:rgba(6,182,212,0.2);color:#22d3ee">用才</span>
+        <span class="tag" style="background:rgba(236,72,153,0.2);color:#f472b6">留才</span>
       </div>
     </div>
-    
-    <!-- 2. 標題衝擊：現狀困境 -->
-    <div class="slide">
-      <div class="light-spot light-spot-2"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <h1 class="text-4xl font-black leading-tight">
-          招募週期長<br>
-          培訓效果難追蹤<br>
-          離職率難預測
-        </h1>
-      </div>
-    </div>
-    
-    <!-- 3. 金句：核心理念 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <span class="text-6xl text-gray-600 block mb-2">"</span>
-        <p class="text-2xl font-bold mb-6">AI 不是來取代 HR<br>而是讓 HR 更有價值</p>
-        <span class="text-lg font-light text-gray-500">— 從事務性到戰略性</span>
-      </div>
-    </div>
-    
-    <!-- 4. 章節：選 -->
-    <div class="slide">
-      <div class="light-spot light-spot-2"></div>
-      <div class="slide-content">
-        <span class="text-7xl font-black text-blue-500 mb-4">選</span>
-        <h2 class="text-3xl font-bold text-white">AI 改寫招募遊戲</h2>
-      </div>
-    </div>
-    
-    <!-- 5. 數據對比：履歷篩選 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <div class="mb-8">
-          <span class="text-red-400 line-through text-2xl block mb-2">人工篩選 200 份履歷</span>
-          <span class="text-xl text-gray-500">2 天</span>
-        </div>
-        <div class="mt-8">
-          <span class="text-6xl font-black text-green-400 block">3 分鐘</span>
-          <p class="text-xl font-light text-gray-400 mt-4">AI 自動篩選<br>準確率 85%</p>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 6. 步驟說明：AI 面試官 -->
-    <div class="slide">
-      <div class="light-spot light-spot-2"></div>
-      <div class="slide-content">
-        <h2 class="text-3xl font-bold text-white mb-6">AI 面試官</h2>
-        <p class="text-lg font-light text-gray-400 leading-relaxed">
-          分析語氣、表情、邏輯<br>
-          結構化評分，消除偏見<br>
-          HR 專注文化契合度
-        </p>
-      </div>
-    </div>
-    
-    <!-- 7. 步驟說明：智能配對 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <h2 class="text-3xl font-bold text-white mb-6">人才庫智能配對</h2>
-        <p class="text-lg font-light text-gray-400 leading-relaxed">
-          職缺一出，自動搜尋<br>
-          內部 + 外部候選人<br>
-          配對分數一目了然
-        </p>
-      </div>
-    </div>
-    
-    <!-- 8. 章節：育 -->
-    <div class="slide">
-      <div class="light-spot light-spot-2"></div>
-      <div class="slide-content">
-        <span class="text-7xl font-black text-purple-500 mb-4">育</span>
-        <h2 class="text-3xl font-bold text-white">培訓個人化時代</h2>
-      </div>
-    </div>
-    
-    <!-- 9. 列表：培訓三大突破 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <h2 class="text-2xl font-bold text-white mb-8">培訓三大突破</h2>
-        <ul class="space-y-6 text-xl text-left">
-          <li class="text-gray-300">• 學習路徑 AI 推薦</li>
-          <li class="text-gray-300">• 能力缺口即時分析</li>
-          <li class="text-gray-300">• 知識庫智能問答</li>
-        </ul>
-      </div>
-    </div>
-    
-    <!-- 10. 數據：培訓效果 -->
-    <div class="slide">
-      <div class="light-spot light-spot-2"></div>
-      <div class="slide-content">
-        <span class="text-7xl font-black text-white">50%</span>
-        <p class="text-xl font-light text-gray-400 mt-4">新人 onboarding<br>時間縮短</p>
-      </div>
-    </div>
-    
-    <!-- 11. 章節：用 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="slide-content">
-        <span class="text-7xl font-black text-cyan-500 mb-4">用</span>
-        <h2 class="text-3xl font-bold text-white">員工表現可視化</h2>
-      </div>
-    </div>
-    
-    <!-- 12. 步驟說明：績效預測 -->
-    <div class="slide">
-      <div class="light-spot light-spot-2"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <h2 class="text-3xl font-bold text-white mb-6">績效預測與預警</h2>
-        <p class="text-lg font-light text-gray-400 leading-relaxed">
-          AI 分析歷史數據<br>
-          高風險員工提前預警<br>
-          主管提前介入
-        </p>
-      </div>
-    </div>
-    
-    <!-- 13. 章節：留 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="slide-content">
-        <span class="text-7xl font-black text-pink-500 mb-4">留</span>
-        <h2 class="text-3xl font-bold text-white">離職預測與挽留</h2>
-      </div>
-    </div>
-    
-    <!-- 14. 數據：離職預警 -->
-    <div class="slide">
-      <div class="light-spot light-spot-2"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <span class="text-7xl font-black text-white">3 個月</span>
-        <p class="text-xl font-light text-gray-400 mt-4">離職前預警<br>HR 有時間介入</p>
-      </div>
-    </div>
-    
-    <!-- 15. 步驟說明：個性化激勵 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="slide-content">
-        <h2 class="text-3xl font-bold text-white mb-6">個性化激勵方案</h2>
-        <p class="text-lg font-light text-gray-400 leading-relaxed">
-          分析員工偏好<br>
-          不同人用不同激勵<br>
-          成本不變，效果翻倍
-        </p>
-      </div>
-    </div>
-    
-    <!-- 16. 列表：落地三步驟 -->
-    <div class="slide">
-      <div class="light-spot light-spot-2"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <h2 class="text-2xl font-bold text-white mb-8">落地三步驟</h2>
-        <ul class="space-y-6 text-xl text-left">
-          <li class="text-gray-300">• 第一步：選定試點場景</li>
-          <li class="text-gray-300">• 第二步：小範圍驗證</li>
-          <li class="text-gray-300">• 第三步：全面推廣</li>
-        </ul>
-      </div>
-    </div>
-    
-    <!-- 17. 建議：從哪開始 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <h2 class="text-3xl font-bold text-white mb-6">建議從這裡開始</h2>
-        <div class="text-left space-y-4 text-lg text-gray-400">
-          <p>✓ 履歷篩選自動化</p>
-          <p class="text-sm text-gray-500 ml-6">見效快、風險低</p>
-          <p>✓ 3 個月驗證效果</p>
-          <p class="text-sm text-gray-500 ml-6">建立成功案例</p>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 18. 對比頁：HR 角色轉變 -->
-    <div class="slide">
-      <div class="light-spot light-spot-2"></div>
-      <div class="slide-content">
-        <div class="mb-8">
-          <span class="text-red-400 line-through text-xl block mb-2">傳統 HR</span>
-          <p class="text-gray-500 text-sm">處理問題</p>
-        </div>
-        <div class="mt-8">
-          <span class="text-3xl font-bold text-green-400 block mb-2">AI 時代 HR</span>
-          <p class="text-gray-300 text-lg">預測問題<br>設計解決方案</p>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 19. 金句：未來趨勢 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <span class="text-6xl text-gray-600 block mb-2">"</span>
-        <p class="text-2xl font-bold mb-6">AI 時代的 HR<br>不是會用 Excel<br>而是會用 AI</p>
-      </div>
-    </div>
-    
-    <!-- 20. 結尾行動頁 -->
-    <div class="slide">
-      <div class="light-spot light-spot-1"></div>
-      <div class="light-spot light-spot-2"></div>
-      <div class="light-spot light-spot-3"></div>
-      <div class="slide-content">
-        <h1 class="text-3xl font-bold text-white mb-8">現在開始<br>還不算晚</h1>
-        <p class="text-xl font-light text-gray-400">選育用留，每個環節<br>都可以更智能</p>
-      </div>
-    </div>
-    
   </div>
-  
-  <div class="progress-bar" id="progressBar"></div>
-  <div class="page-number" id="pageNumber">1 / 20</div>
-  
-  <script>
-    const slides = document.querySelectorAll('.slide');
-    const progressBar = document.getElementById('progressBar');
-    const pageNumber = document.getElementById('pageNumber');
-    let currentSlide = 0;
-    
-    slides.forEach((_, index) => {
-      const dot = document.createElement('div');
-      dot.className = `progress-dot ${index === 0 ? 'active' : ''}`;
-      dot.addEventListener('click', () => goToSlide(index));
-      progressBar.appendChild(dot);
+
+  <!-- 2. 痛點 -->
+  <div class="slide">
+    <div class="light-spot ls2"></div>
+    <div class="light-spot ls3"></div>
+    <div class="content">
+      <p style="font-size:0.85rem;color:#6b7280;letter-spacing:0.1em;margin-bottom:1.5rem">THE PROBLEM</p>
+      <h1 style="font-size:2rem;font-weight:900;margin-bottom:2rem;line-height:1.3">傳統HR的<br>三大困境</h1>
+      <div style="display:flex;flex-direction:column;gap:1rem;text-align:left">
+        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:0.75rem">
+          <span style="font-size:1.5rem">⏰</span>
+          <div>
+            <p style="font-weight:700;color:#fca5a5">招募週期過長</p>
+            <p style="font-size:0.8rem;color:#9ca3af">平均每份職缺耗時 45 天</p>
+          </div>
+        </div>
+        <div style="background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:0.75rem">
+          <span style="font-size:1.5rem">📊</span>
+          <div>
+            <p style="font-weight:700;color:#fde047">培訓效果難追蹤</p>
+            <p style="font-size:0.8rem;color:#9ca3af">無法量化學習成效</p>
+          </div>
+        </div>
+        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:0.75rem">
+          <span style="font-size:1.5rem">🚪</span>
+          <div>
+            <p style="font-weight:700;color:#fca5a5">離職無預警</p>
+            <p style="font-size:0.8rem;color:#9ca3af">人才流失難以預防</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 核心理念 -->
+  <div class="slide">
+    <div class="light-spot ls1"></div>
+    <div class="light-spot ls3"></div>
+    <div class="content">
+      <div style="font-size:3.5rem;margin-bottom:1rem">⚡</div>
+      <span class="tag" style="background:rgba(59,130,246,0.2);color:#60a5fa;margin-bottom:1.5rem;display:inline-block">核心理念</span>
+      <h1 style="font-size:1.8rem;font-weight:900;line-height:1.4;margin-bottom:1.5rem">AI 不是來<br><span style="color:#ef4444;text-decoration:line-through">取代</span> HR<br>而是讓 HR<br><span style="color:#22d3ee">更有價值</span></h1>
+      <div style="display:flex;gap:1rem;justify-content:center;margin-top:1rem">
+        <div style="text-align:center">
+          <div style="font-size:0.75rem;color:#6b7280">事務性工作</div>
+          <div style="font-size:1.5rem">↓</div>
+          <div style="font-size:0.75rem;color:#22d3ee">交給 AI</div>
+        </div>
+        <div style="width:1px;background:rgba(255,255,255,0.1)"></div>
+        <div style="text-align:center">
+          <div style="font-size:0.75rem;color:#6b7280">戰略性工作</div>
+          <div style="font-size:1.5rem">↑</div>
+          <div style="font-size:0.75rem;color:#a78bfa">HR 升級</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 章節：選 -->
+  <div class="slide">
+    <div class="light-spot ls1" style="opacity:0.4"></div>
+    <div class="light-spot ls2"></div>
+    <div class="content">
+      <span style="font-size:5rem;font-weight:900;color:#3b82f6;display:block;margin-bottom:0.5rem">選</span>
+      <h2 style="font-size:1.6rem;font-weight:700;margin-bottom:0.5rem">AI 改寫招募遊戲</h2>
+      <p style="color:#6b7280;font-size:0.9rem">Talent Acquisition</p>
+      <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center">
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">🔍</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">智能篩選</p>
+        </div>
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">🎙️</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">AI 面試</p>
+        </div>
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">🎯</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">精準配對</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 履歷篩選數據對比 -->
+  <div class="slide">
+    <div class="light-spot ls1"></div>
+    <div class="light-spot ls3"></div>
+    <div class="content">
+      <p style="font-size:0.8rem;color:#6b7280;letter-spacing:0.1em;margin-bottom:1.5rem">履歷篩選效率</p>
+      <div style="margin-bottom:2rem">
+        <div style="opacity:0.5;margin-bottom:1.5rem">
+          <p style="font-size:0.8rem;color:#ef4444;text-decoration:line-through;margin-bottom:0.25rem">傳統人工</p>
+          <span style="font-size:2.5rem;font-weight:900;color:#6b7280">2 天</span>
+          <p style="font-size:0.8rem;color:#6b7280">篩選 200 份履歷</p>
+          <div class="stat-bar"><div class="stat-fill" style="width:100%;background:#4b5563"></div></div>
+        </div>
+        <div>
+          <p style="font-size:0.8rem;color:#22d3ee;margin-bottom:0.25rem">AI 自動篩選</p>
+          <span style="font-size:4rem;font-weight:900;color:#fff">3 分鐘</span>
+          <p style="font-size:0.8rem;color:#9ca3af">準確率 85%，越用越精準</p>
+          <div class="stat-bar" style="margin-top:0.5rem"><div class="stat-fill" style="width:85%;background:linear-gradient(90deg,#3b82f6,#22d3ee)"></div></div>
+        </div>
+      </div>
+      <div style="background:rgba(34,211,238,0.1);border-radius:12px;padding:0.75rem">
+        <p style="font-size:0.85rem;color:#22d3ee;font-weight:700">效率提升 <span style="font-size:1.2rem">96%</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. AI 面試官 -->
+  <div class="slide">
+    <div class="light-spot ls2"></div>
+    <div class="content">
+      <div class="icon-circle" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3)">🎙️</div>
+      <h2 style="font-size:1.8rem;font-weight:900;margin-bottom:1.5rem">AI 面試官</h2>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;text-align:left">
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <span style="color:#3b82f6;font-size:1.2rem">●</span>
+          <p style="font-size:0.9rem">分析<strong>語氣、表情、邏輯</strong>結構</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <span style="color:#3b82f6;font-size:1.2rem">●</span>
+          <p style="font-size:0.9rem">結構化評分，<strong>消除主觀偏見</strong></p>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <span style="color:#3b82f6;font-size:1.2rem">●</span>
+          <p style="font-size:0.9rem">HR 只需評估<strong>文化契合度</strong></p>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem;background:rgba(59,130,246,0.1);border-radius:12px;padding:1rem">
+        <p style="font-size:0.8rem;color:#93c5fd">面試時間縮短 <strong style="font-size:1.1rem;color:#fff">60%</strong>，篩選品質提升</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 章節：育 -->
+  <div class="slide">
+    <div class="light-spot ls2" style="background:#8b5cf6;opacity:0.4"></div>
+    <div class="light-spot ls-pink"></div>
+    <div class="content">
+      <span style="font-size:5rem;font-weight:900;color:#8b5cf6;display:block;margin-bottom:0.5rem">育</span>
+      <h2 style="font-size:1.6rem;font-weight:700;margin-bottom:0.5rem">培訓個人化時代</h2>
+      <p style="color:#6b7280;font-size:0.9rem">Learning & Development</p>
+      <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center">
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">🗺️</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">學習路徑</p>
+        </div>
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">📈</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">能力分析</p>
+        </div>
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">💬</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">即問即答</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. 培訓對比 -->
+  <div class="slide">
+    <div class="light-spot ls1"></div>
+    <div class="light-spot ls3"></div>
+    <div class="content">
+      <p style="font-size:0.8rem;color:#6b7280;letter-spacing:0.1em;margin-bottom:1.5rem">培訓模式進化</p>
+      <div style="display:flex;gap:0.75rem;margin-bottom:2rem">
+        <div style="flex:1;background:rgba(107,114,128,0.15);border:1px solid rgba(107,114,128,0.3);border-radius:12px;padding:1rem;text-align:center">
+          <p style="font-size:0.75rem;color:#6b7280;margin-bottom:0.75rem">❌ 傳統</p>
+          <p style="font-size:0.85rem;font-weight:700;color:#9ca3af">大鍋飯課程</p>
+          <p style="font-size:0.7rem;color:#6b7280;margin-top:0.5rem">所有人上一樣的課</p>
+          <div style="margin-top:0.75rem;font-size:0.7rem;color:#6b7280">→ 效率低落</div>
+        </div>
+        <div style="flex:1;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.4);border-radius:12px;padding:1rem;text-align:center">
+          <p style="font-size:0.75rem;color:#a78bfa;margin-bottom:0.75rem">✅ AI</p>
+          <p style="font-size:0.85rem;font-weight:700;color:#fff">個人化路徑</p>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.5rem">AI 推薦專屬課表</p>
+          <div style="margin-top:0.75rem;font-size:0.7rem;color:#a78bfa">→ 精準提升</div>
+        </div>
+      </div>
+      <div style="background:rgba(139,92,246,0.1);border-radius:12px;padding:0.75rem">
+        <p style="font-size:2.5rem;font-weight:900;color:#fff">50%</p>
+        <p style="font-size:0.8rem;color:#a78bfa">新人 Onboarding 時間縮短</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. 章節：用 -->
+  <div class="slide">
+    <div class="light-spot ls3" style="background:#06b6d4;opacity:0.4"></div>
+    <div class="light-spot ls-green"></div>
+    <div class="content">
+      <span style="font-size:5rem;font-weight:900;color:#06b6d4;display:block;margin-bottom:0.5rem">用</span>
+      <h2 style="font-size:1.6rem;font-weight:700;margin-bottom:0.5rem">員工表現可視化</h2>
+      <p style="color:#6b7280;font-size:0.9rem">Performance Management</p>
+      <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center">
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">🔮</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">績效預測</p>
+        </div>
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">🎯</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">崗位匹配</p>
+        </div>
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">🤝</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">協作優化</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. 績效可視化 -->
+  <div class="slide">
+    <div class="light-spot ls2"></div>
+    <div class="light-spot ls3"></div>
+    <div class="content">
+      <div class="icon-circle" style="background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3)">🔮</div>
+      <h2 style="font-size:1.6rem;font-weight:900;margin-bottom:1.5rem">AI 績效雷達</h2>
+      <div style="display:flex;flex-direction:column;gap:0.85rem;text-align:left">
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem">
+            <span style="font-size:0.8rem;color:#9ca3af">工作效率</span>
+            <span style="font-size:0.8rem;color:#22d3ee;font-weight:700">92%</span>
+          </div>
+          <div class="stat-bar"><div class="stat-fill" style="width:92%;background:linear-gradient(90deg,#06b6d4,#22d3ee)"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem">
+            <span style="font-size:0.8rem;color:#9ca3af">團隊協作</span>
+            <span style="font-size:0.8rem;color:#a78bfa;font-weight:700">78%</span>
+          </div>
+          <div class="stat-bar"><div class="stat-fill" style="width:78%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem">
+            <span style="font-size:0.8rem;color:#9ca3af">技能成長</span>
+            <span style="font-size:0.8rem;color:#34d399;font-weight:700">85%</span>
+          </div>
+          <div class="stat-bar"><div class="stat-fill" style="width:85%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:1.25rem;background:rgba(6,182,212,0.1);border-radius:12px;padding:0.75rem">
+        <p style="font-size:0.8rem;color:#22d3ee">⚡ 高風險員工<strong> 提前預警</strong>，主管可提前介入</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. 章節：留 -->
+  <div class="slide">
+    <div class="light-spot ls-pink" style="opacity:0.4"></div>
+    <div class="light-spot ls1"></div>
+    <div class="content">
+      <span style="font-size:5rem;font-weight:900;color:#ec4899;display:block;margin-bottom:0.5rem">留</span>
+      <h2 style="font-size:1.6rem;font-weight:700;margin-bottom:0.5rem">離職預測與挽留</h2>
+      <p style="color:#6b7280;font-size:0.9rem">Retention Management</p>
+      <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center">
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">🚨</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">離職預警</p>
+        </div>
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">🎁</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">個人化激勵</p>
+        </div>
+        <div style="text-align:center;padding:0.75rem">
+          <div style="font-size:1.5rem">📡</div>
+          <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.25rem">氛圍監測</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. 離職預警數據 -->
+  <div class="slide">
+    <div class="light-spot ls2"></div>
+    <div class="light-spot ls3"></div>
+    <div class="content">
+      <p style="font-size:0.8rem;color:#6b7280;letter-spacing:0.1em;margin-bottom:1rem">AI 離職預警系統</p>
+      <div style="position:relative;width:160px;height:160px;margin:0 auto 1.5rem">
+        <svg viewBox="0 0 160 160" style="width:100%;transform:rotate(-90deg)">
+          <circle cx="80" cy="80" r="65" fill="none" stroke="rgba(236,72,153,0.2)" stroke-width="12"/>
+          <circle cx="80" cy="80" r="65" fill="none" stroke="#ec4899" stroke-width="12" stroke-dasharray="408" stroke-dashoffset="102" style="transition:stroke-dashoffset 1.5s ease"/>
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+          <p style="font-size:2rem;font-weight:900;color:#fff">75%</p>
+          <p style="font-size:0.65rem;color:#f472b6">預警準確率</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.75rem">
+        <div style="flex:1;background:rgba(236,72,153,0.1);border:1px solid rgba(236,72,153,0.3);border-radius:10px;padding:0.75rem;text-align:center">
+          <p style="font-size:1.5rem;font-weight:900;color:#fff">3個月</p>
+          <p style="font-size:0.7rem;color:#f9a8d4">提前預警時間</p>
+        </div>
+        <div style="flex:1;background:rgba(236,72,153,0.1);border:1px solid rgba(236,72,153,0.3);border-radius:10px;padding:0.75rem;text-align:center">
+          <p style="font-size:1.5rem;font-weight:900;color:#fff">30%↓</p>
+          <p style="font-size:0.7rem;color:#f9a8d4">離職率降低</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13. 落地步驟 -->
+  <div class="slide">
+    <div class="light-spot ls1"></div>
+    <div class="light-spot ls2"></div>
+    <div class="content">
+      <p style="font-size:0.8rem;color:#6b7280;letter-spacing:0.1em;margin-bottom:1.5rem">落地路徑</p>
+      <h2 style="font-size:1.8rem;font-weight:900;margin-bottom:1.5rem">從 0 到 1<br>三步驟</h2>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;flex-shrink:0">1</div>
+          <div style="text-align:left">
+            <p style="font-weight:700">選定試點場景</p>
+            <p style="font-size:0.75rem;color:#9ca3af">從「履歷篩選」開始，見效快</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;flex-shrink:0">2</div>
+          <div style="text-align:left">
+            <p style="font-weight:700">小範圍驗證</p>
+            <p style="font-size:0.75rem;color:#9ca3af">3 個月驗證，建立成功案例</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;flex-shrink:0">3</div>
+          <div style="text-align:left">
+            <p style="font-weight:700">全面推廣</p>
+            <p style="font-size:0.75rem;color:#9ca3af">成功案例變標準流程</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14. HR 角色進化 -->
+  <div class="slide">
+    <div class="light-spot ls3"></div>
+    <div class="light-spot ls-pink"></div>
+    <div class="content">
+      <p style="font-size:0.8rem;color:#6b7280;letter-spacing:0.1em;margin-bottom:1.5rem">角色進化</p>
+      <h2 style="font-size:1.6rem;font-weight:900;margin-bottom:1.5rem">HR 的<br>兩個時代</h2>
+      <div style="display:flex;gap:0.75rem">
+        <div style="flex:1;background:rgba(107,114,128,0.1);border:1px solid rgba(107,114,128,0.2);border-radius:12px;padding:1rem">
+          <p style="font-size:0.7rem;color:#6b7280;margin-bottom:0.75rem">過去</p>
+          <p style="font-size:0.85rem;font-weight:700;color:#9ca3af;margin-bottom:1rem">行政型 HR</p>
+          <div style="font-size:0.7rem;color:#6b7280;display:flex;flex-direction:column;gap:0.5rem">
+            <p>📋 處理表單</p>
+            <p>📞 人工通知</p>
+            <p>📁 手動歸檔</p>
+            <p>🤔 憑感覺決策</p>
+          </div>
+        </div>
+        <div style="flex:1;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:12px;padding:1rem">
+          <p style="font-size:0.7rem;color:#60a5fa;margin-bottom:0.75rem">AI 時代</p>
+          <p style="font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:1rem">戰略型 HR</p>
+          <div style="font-size:0.7rem;color:#9ca3af;display:flex;flex-direction:column;gap:0.5rem">
+            <p>🤖 AI 處理事務</p>
+            <p>📊 數據驅動</p>
+            <p>🔮 預測問題</p>
+            <p>💡 設計解決方案</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 15. 結尾 -->
+  <div class="slide">
+    <div class="light-spot ls1"></div>
+    <div class="light-spot ls2"></div>
+    <div class="light-spot ls3"></div>
+    <div class="content">
+      <div style="font-size:3rem;margin-bottom:1rem">🚀</div>
+      <h1 style="font-size:2.2rem;font-weight:900;line-height:1.2;margin-bottom:1rem">現在開始<br>還不算晚</h1>
+      <p style="color:#9ca3af;margin-bottom:2rem;font-size:0.9rem">選育用留，每個環節<br>都可以更智能</p>
+      <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap">
+        <span class="tag" style="background:rgba(59,130,246,0.2);color:#60a5fa">🔍 選才加速</span>
+        <span class="tag" style="background:rgba(139,92,246,0.2);color:#a78bfa">📚 育才精準</span>
+        <span class="tag" style="background:rgba(6,182,212,0.2);color:#22d3ee">📊 用才可視</span>
+        <span class="tag" style="background:rgba(236,72,153,0.2);color:#f472b6">❤️ 留才智能</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="page-num" id="pageNum">1 / 15</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const pb = document.getElementById('progressBar');
+  const pn = document.getElementById('pageNum');
+  let cur = 0;
+
+  slides.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = `dot ${i===0?'active':''}`;
+    d.onclick = () => go(i);
+    pb.appendChild(d);
+  });
+
+  function update() {
+    slides.forEach((s,i) => {
+      s.classList.remove('active','prev');
+      if(i===cur) s.classList.add('active');
+      else if(i<cur) s.classList.add('prev');
     });
-    
-    function updateSlides() {
-      slides.forEach((slide, index) => {
-        slide.classList.remove('active', 'prev');
-        if (index === currentSlide) {
-          slide.classList.add('active');
-        } else if (index < currentSlide) {
-          slide.classList.add('prev');
-        }
-      });
-      
-      document.querySelectorAll('.progress-dot').forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentSlide);
-      });
-      
-      pageNumber.textContent = `${currentSlide + 1} / ${slides.length}`;
-    }
-    
-    function nextSlide() {
-      if (currentSlide < slides.length - 1) {
-        currentSlide++;
-        updateSlides();
-      }
-    }
-    
-    function prevSlide() {
-      if (currentSlide > 0) {
-        currentSlide--;
-        updateSlides();
-      }
-    }
-    
-    function goToSlide(index) {
-      currentSlide = index;
-      updateSlides();
-    }
-    
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') {
-        nextSlide();
-      } else if (e.key === 'ArrowLeft') {
-        prevSlide();
-      }
-    });
-    
-    let touchStartX = 0;
-    document.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
-    });
-    
-    document.addEventListener('touchend', (e) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const diff = touchStartX - touchEndX;
-      if (Math.abs(diff) > 50) {
-        if (diff > 0) nextSlide();
-        else prevSlide();
-      }
-    });
-  </script>
+    document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active',i===cur));
+    pn.textContent = `${cur+1} / ${slides.length}`;
+  }
+
+  function go(i) { cur=i; update(); }
+  function next() { if(cur<slides.length-1){cur++;update();} }
+  function prev() { if(cur>0){cur--;update();} }
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' ') next();
+    else if(e.key==='ArrowLeft') prev();
+  });
+
+  let tx=0;
+  document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+  document.addEventListener('touchend',e=>{
+    const diff=tx-e.changedTouches[0].clientX;
+    if(Math.abs(diff)>50){diff>0?next():prev();}
+  });
+</script>
 </body>
 </html>
