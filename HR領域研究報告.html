@@ -148,6 +148,7 @@
             border-collapse: collapse;
             margin: 20px 0;
             font-size: 0.95em;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         th {
@@ -156,6 +157,8 @@
             padding: 12px;
             text-align: left;
             font-weight: 600;
+            position: sticky;
+            top: 0;
         }
 
         td {
@@ -165,6 +168,52 @@
 
         tr:hover {
             background: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            table {
+                border: 0;
+                box-shadow: none;
+            }
+
+            table thead {
+                display: none;
+            }
+
+            table, table tbody, table tr, table td {
+                display: block;
+                width: 100%;
+            }
+
+            table tr {
+                margin-bottom: 20px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 0;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+
+            table td {
+                text-align: right;
+                padding: 12px;
+                position: relative;
+                padding-left: 50%;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+
+            table td:last-child {
+                border-bottom: none;
+            }
+
+            table td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 12px;
+                font-weight: bold;
+                color: #667eea;
+                text-align: left;
+            }
         }
 
         .status-badge {
@@ -248,20 +297,152 @@
                 padding: 20px;
             }
 
+            header {
+                padding: 30px 20px;
+            }
+
             header h1 {
                 font-size: 1.8em;
+                margin-bottom: 8px;
+            }
+
+            header p {
+                font-size: 1em;
             }
 
             .section-header {
-                font-size: 1.4em;
+                font-size: 1.3em;
+                margin-bottom: 20px;
+            }
+
+            h3 {
+                font-size: 1.2em;
+                margin-top: 20px;
+            }
+
+            h4 {
+                font-size: 1em;
             }
 
             table {
-                font-size: 0.85em;
+                font-size: 0.8em;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
             }
 
             th, td {
-                padding: 8px;
+                padding: 8px 6px;
+            }
+
+            .highlight {
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            .pricing-box {
+                padding: 20px;
+                font-size: 1em;
+            }
+
+            .pricing-box .value {
+                font-size: 1.2em;
+            }
+
+            .opportunity-box {
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            .code-block {
+                padding: 15px;
+                font-size: 0.8em;
+                overflow-x: auto;
+            }
+
+            .action-list li {
+                padding-left: 35px;
+                margin-bottom: 15px;
+            }
+
+            .action-list li:before {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9em;
+            }
+
+            ul {
+                margin-left: 15px;
+            }
+
+            li {
+                margin-bottom: 8px;
+                line-height: 1.5;
+            }
+
+            section {
+                margin-bottom: 35px;
+            }
+
+            footer {
+                padding: 20px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 15px;
+            }
+
+            header {
+                padding: 25px 15px;
+            }
+
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            header p {
+                font-size: 0.9em;
+            }
+
+            .section-header {
+                font-size: 1.2em;
+            }
+
+            h3 {
+                font-size: 1.1em;
+            }
+
+            table {
+                font-size: 0.7em;
+            }
+
+            th, td {
+                padding: 6px 4px;
+            }
+
+            .highlight, .opportunity-box {
+                padding: 12px;
+                margin: 12px 0;
+            }
+
+            .pricing-box {
+                padding: 15px;
+                font-size: 0.95em;
+            }
+
+            ul {
+                margin-left: 12px;
+            }
+
+            li {
+                margin-bottom: 6px;
+            }
+
+            section {
+                margin-bottom: 25px;
             }
         }
 
@@ -546,46 +727,46 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>選（招聘 AI）</td>
-                            <td>已成熟</td>
-                            <td><span class="status-badge badge-high">✅ 高</span></td>
-                            <td>否</td>
-                            <td><strong>P1</strong></td>
+                            <td data-label="項目">選（招聘 AI）</td>
+                            <td data-label="現狀">已成熟</td>
+                            <td data-label="可行性"><span class="status-badge badge-high">✅ 高</span></td>
+                            <td data-label="補助機會">否</td>
+                            <td data-label="優先級"><strong>P1</strong></td>
                         </tr>
                         <tr>
-                            <td>育（績效+學習）</td>
-                            <td>部份成熟</td>
-                            <td><span class="status-badge badge-medium">⚠️ 中</span></td>
-                            <td><span class="status-badge badge-high">✅ TTQS</span></td>
-                            <td>P2</td>
+                            <td data-label="項目">育（績效+學習）</td>
+                            <td data-label="現狀">部份成熟</td>
+                            <td data-label="可行性"><span class="status-badge badge-medium">⚠️ 中</span></td>
+                            <td data-label="補助機會"><span class="status-badge badge-high">✅ TTQS</span></td>
+                            <td data-label="優先級">P2</td>
                         </tr>
                         <tr>
-                            <td>用（人崗配置）</td>
-                            <td>多數未做</td>
-                            <td><span class="status-badge badge-medium">⚠️ 中</span></td>
-                            <td><span class="status-badge badge-high">✅ 顧問補助</span></td>
-                            <td>P2</td>
+                            <td data-label="項目">用（人崗配置）</td>
+                            <td data-label="現狀">多數未做</td>
+                            <td data-label="可行性"><span class="status-badge badge-medium">⚠️ 中</span></td>
+                            <td data-label="補助機會"><span class="status-badge badge-high">✅ 顧問補助</span></td>
+                            <td data-label="優先級">P2</td>
                         </tr>
                         <tr>
-                            <td><strong>留（流失預防）</strong></td>
-                            <td>大廠才有</td>
-                            <td><span class="status-badge badge-high">✅ 很高</span></td>
-                            <td><span class="status-badge badge-high">✅ 顧問補助</span></td>
-                            <td><strong style="color: #e74c3c;">P1 🎯</strong></td>
+                            <td data-label="項目"><strong>留（流失預防）</strong></td>
+                            <td data-label="現狀">大廠才有</td>
+                            <td data-label="可行性"><span class="status-badge badge-high">✅ 很高</span></td>
+                            <td data-label="補助機會"><span class="status-badge badge-high">✅ 顧問補助</span></td>
+                            <td data-label="優先級"><strong style="color: #e74c3c;">P1 🎯</strong></td>
                         </tr>
                         <tr>
-                            <td>TTQS 認證</td>
-                            <td>台灣國家級</td>
-                            <td><span class="status-badge badge-high">✅ 高</span></td>
-                            <td><span class="status-badge badge-high">✅ 80% 補助</span></td>
-                            <td><strong>P1</strong></td>
+                            <td data-label="項目">TTQS 認證</td>
+                            <td data-label="現狀">台灣國家級</td>
+                            <td data-label="可行性"><span class="status-badge badge-high">✅ 高</span></td>
+                            <td data-label="補助機會"><span class="status-badge badge-high">✅ 80% 補助</span></td>
+                            <td data-label="優先級"><strong>P1</strong></td>
                         </tr>
                         <tr>
-                            <td>教育訓練</td>
-                            <td>業務改造</td>
-                            <td><span class="status-badge badge-high">✅ 高</span></td>
-                            <td><span class="status-badge badge-high">✅ 多種補助</span></td>
-                            <td><strong>P1</strong></td>
+                            <td data-label="項目">教育訓練</td>
+                            <td data-label="現狀">業務改造</td>
+                            <td data-label="可行性"><span class="status-badge badge-high">✅ 高</span></td>
+                            <td data-label="補助機會"><span class="status-badge badge-high">✅ 多種補助</span></td>
+                            <td data-label="優先級"><strong>P1</strong></td>
                         </tr>
                     </tbody>
                 </table>
